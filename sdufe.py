@@ -120,7 +120,6 @@ class SDUFE:
         _, binary = cv.threshold(gray, 185, 255, cv.THRESH_BINARY_INV)
         # 逻辑运算：让背景为白色，字体为黑色，便于识别
         cv.bitwise_not(binary, binary)
-        self.image_path = './test.png'
         cv.imwrite(self.image_path, binary)
 
     def baidu_ocr(self):
