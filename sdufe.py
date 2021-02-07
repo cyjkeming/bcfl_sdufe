@@ -1,12 +1,11 @@
 # coding=utf-8
+# Author: CheYujie
 
 import requests
 from bs4 import BeautifulSoup as bs
 import time
 import datetime
-from aip import AipOcr
 import cv2 as cv
-from PIL import Image
 import base64
 from city_id import city_id
 from wxpy import *
@@ -45,7 +44,7 @@ class SDUFE:
         self.general = False
         self.APP_ID = 'xxx'
         self.API_KEY = 'xxx'
-        self.SECRET_KEY = 'xxx'
+        self.SECRET_KEY = 'axxx'
         self.max_time = int(max_time)
         self.level = 1
         self.message = self.name + self.title + "："
@@ -148,9 +147,9 @@ class SDUFE:
         if "error_code" in response:
             if str(response["error_code"]) == "17" and self.level == 1:
                 print("change line 2")
-                self.APP_ID = 'xxx'
-                self.API_KEY = 'xxx'
-                self.SECRET_KEY = 'xxx'
+                self.APP_ID = 'yyy'
+                self.API_KEY = 'yyy'
+                self.SECRET_KEY = 'yyy'
                 self.level += 1
             elif str(response["error_code"]) == "17" and self.level == 2:
                 print("change general mode")
@@ -248,12 +247,12 @@ class SDUFE:
                 print("签到成功了啊")
                 return True
             else:
-                return self.result()
+                return False
         elif self.max_time < 0:
             self.message += "\n2. 提交失败，验证码使用次数达到了上限（每人 10 次），请手动打卡吧。"
             return False
         else:
-            return self.result()
+            return False
 
     def full_process(self):
         login = self.login()
@@ -310,9 +309,13 @@ class SDUFE:
 
 if __name__ == "__main__":
     bot = Bot(console_qr=1)
+    me = bot.file_helper
     while True:
         hour = time.strftime("%H")
-        if str(hour) == "22":
+        print(hour)
+        if str(hour) == "00":
+            today = datetime.date.today().strftime('%m-%d')
+            me.send(f"开始 {today} 的打卡...")
             with open("./list.txt", encoding="utf-8") as f:
                 students = f.readlines()
             for student in students:
@@ -339,12 +342,14 @@ if __name__ == "__main__":
                 cid = city_id[city]
                 addr = text[10]
                 max_time = str(text[11])
-                today = datetime.date.today().strftime('%m-%d')
                 sdufe = SDUFE(is_student, user, pwd, name, wxname, sex,
                               phone, p_phone, addr, pid, cid, today, bot, max_time)
                 sdufe.daka()
                 sdufe = ""
                 time.sleep(5)
-            time.sleep(23 * 60 * 60)
-        time.sleep(10 * 60)
-        bot.join()
+            time.sleep(21 * 60 * 60)
+        elif str(hour) == "21":
+            me.send("程序正常运行中...")
+            time.sleep(2 * 60 * 60)
+        else:
+            time.sleep(10 * 60)
